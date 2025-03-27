@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.ClassloaderBridge;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -52,13 +53,23 @@ public abstract class AbstractRepeater implements Repeater {
         record.setRecordTaskRunId(context.getRecordModel().getTaskRunId());
         record.setHost(INSTANCE.getHost());
         record.setStatus(ReplayStatus.REPLAY_SUCCESS.getCode());
+        record.setOrganizationId(context.getRecordModel().getOrganizationId());
+        record.setDatahubCustomerId(context.getRecordModel().getDatahubCustomerId());
+        record.setMessageId(context.getRecordModel().getMessageId());
 
         try {
             // before invoke advice
             RepeatInterceptorFacade.instance().beforeInvoke(context.getRecordModel());
-
             SysTimeUtils.updateSysTime(context.getRecordModel().getTimestamp());
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            if (contextClassLoader.getClass().getCanonicalName().indexOf("ModuleJarClassLoader") > -1) {
+                ClassLoader webClassLoader = null ;
+                if( (webClassLoader = ClassloaderBridge.instance().decode("org.apache.catalina.loader.ParallelWebappClassLoader")) != null) {
+                    Thread.currentThread().setContextClassLoader(webClassLoader);
+                }
+            }
             Object response = executeRepeat(context);
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
             // after invoke advice
             RepeatInterceptorFacade.instance().beforeReturn(context.getRecordModel(), response);
             record.setResponse(response);

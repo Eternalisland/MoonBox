@@ -80,6 +80,26 @@ public enum InvokeType {
 
     JPA("jpa"),
 
+    NETTY_HTTP("netty-http"),
+
+    DATAHUB_MONITOR_MESSAGE("datahub-monitor-message"),
+
+    DATAHUB_STORAGE_OPERATOR("datahub-storage-operator"),
+
+    DATAHUB_RULE_OPERATOR("datahub-rule-base"),
+
+    DATAHUB_HTTP_CLIENT("datahub-http-client"),
+
+    DATAHUB_ADAPTER_BASE("datahub-adapter-base"),
+
+    DATAHUB_BROKER_SINGLE("datahub-broker-single"),
+    // hessian
+    DATAHUB_HESSIAN_CLIENT("datahub-hessian-client"),
+
+    DATAHUB_HESSIAN_SERVICE("datahub-hessian-service"),
+    // 文件相关操作
+    DATAHUB_DB_FS_OP("datahub-db-fs-op"),
+
     UNKNOWN("unknown");
 
     private String invokeName;
@@ -113,7 +133,7 @@ public enum InvokeType {
 
     /**
      * 对于下面这几种类型插件，不需要记录匹配过程，如果失败了，直接去执行源代码逻辑就行。
-     * 
+     *
      * @param invokeType
      * @return
      */

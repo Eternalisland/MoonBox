@@ -20,7 +20,8 @@ public class SpringContextAdapter {
 
     private static final MoonboxContext MOONBOX_CONTEXT = MoonboxContext.getInstance();
 
-    private final static String SPRING_CONTAINER_CLASS = "com.alibaba.repeater.client.SpringContextContainer";
+//    private final static String SPRING_CONTAINER_CLASS = "com.alibaba.repeater.client.SpringContextContainer";
+    private final static String SPRING_CONTAINER_CLASS = "com.flux.collaboration.services.api.impl.agent.AgentSpringContextContainer";
 
     private volatile static Class<?> springContainerClass;
 

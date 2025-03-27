@@ -23,6 +23,21 @@ import com.vivo.internet.moonbox.common.api.util.ParameterTypesUtil;
 @SuppressWarnings("JavadocReference")
 public class Invocation implements java.io.Serializable {
 
+
+    /**
+     * 组织机构
+     */
+    private String organizationId;
+
+    /**
+     *  消息集
+     */
+    private String datahubCustomerId;
+
+    /**
+     * 消息 messageId
+     */
+    private String messageId;
     /**
      * 调用类型
      *
@@ -375,5 +390,29 @@ public class Invocation implements java.io.Serializable {
         return "Invocation{" +
                 "uri=" + uri +
                 '}';
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getDatahubCustomerId() {
+        return datahubCustomerId;
+    }
+
+    public void setDatahubCustomerId(String datahubCustomerId) {
+        this.datahubCustomerId = datahubCustomerId;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 }

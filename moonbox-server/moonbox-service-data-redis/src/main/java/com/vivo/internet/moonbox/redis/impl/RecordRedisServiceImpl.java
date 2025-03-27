@@ -36,7 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPool;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,12 +49,11 @@ import java.util.Map;
  * 采用摘要方式避免redisIO抖动
  */
 @Service
-@Slf4j
 @Conditional(RedisPropCondition.class)
 public class RecordRedisServiceImpl implements RecordRedisService {
 
     @Autowired(required = false)
-    private JedisCluster jedisCluster;
+    private JedisPool jedisPool;
 
     private static final Splitter sp= Splitter.on(',').omitEmptyStrings().trimResults();
 
@@ -74,14 +75,15 @@ public class RecordRedisServiceImpl implements RecordRedisService {
             return UniqModel.builder().save(true).build();
         }
         List<String> fields =sp.splitToList(recordInterface.getUniqRecordDataFields());
-        try {
+
+        try (Jedis jedis = jedisPool.getResource()){
+
             List<Object>values=getRequestFields(recordWrapper, fields,esRecordEntity.getRequest());
             //构造redis的key
             String key= getKey(esRecordEntity.getTaskRunId(),esRecordEntity.getEntranceDesc(),values);
-            return UniqModel.builder().save( !jedisCluster.exists(key)).uniqKey(key).build();
+            return UniqModel.builder().save( !jedis.exists(key)).uniqKey(key).build();
         }catch (Throwable e){
-            log.error("taskRunId:"+recordWrapper.getTaskRunId()+" entranceUri:"+recordInterface.getUniqueKey()+" "+e.getMessage(),e);
-            return UniqModel.builder().save(true).build();
+        return UniqModel.builder().save(true).build();
         }
     }
 
@@ -102,7 +104,7 @@ public class RecordRedisServiceImpl implements RecordRedisService {
         if(StringUtils.isBlank(recordInterface.getUniqResponseDataFields()) && StringUtils.isBlank(recordInterface.getUniqRecordDataFields())){
             return null;
         }
-        try {
+        try (Jedis jedis = jedisPool.getResource()){
             String str = recordInterface.getUniqRecordDataFields();
             if(!StringUtils.isBlank(str)) {
                 List<String> fields = sp.splitToList(str);
@@ -110,7 +112,7 @@ public class RecordRedisServiceImpl implements RecordRedisService {
                 //构造redis的key
                 String key = getKey(esRecordEntity.getTaskRunId(), esRecordEntity.getEntranceDesc(), values);
                 //生成一个结果集
-                UniqModel uniqModel = UniqModel.builder().save(!jedisCluster.exists(key)).uniqKey(key).build();
+                UniqModel uniqModel = UniqModel.builder().save(!jedis.exists(key)).uniqKey(key).build();
                 if (!uniqModel.isSave()) {
                     return "uniq request skip";
                 }
@@ -125,7 +127,7 @@ public class RecordRedisServiceImpl implements RecordRedisService {
                 //构造redis的key
                 String key = getResponseKey(esRecordEntity.getTaskRunId(), esRecordEntity.getEntranceDesc(), values);
                 //生成一个结果集
-                UniqModel uniqModel = UniqModel.builder().save(!jedisCluster.exists(key)).uniqKey(key).build();
+                UniqModel uniqModel = UniqModel.builder().save(!jedis.exists(key)).uniqKey(key).build();
                 if (!uniqModel.isSave()) {
                     return "uniq response skip";
                 }
@@ -134,7 +136,6 @@ public class RecordRedisServiceImpl implements RecordRedisService {
             }
             return null;
         } catch (Throwable e) {
-            log.error("taskRunId:" + recordWrapper.getTaskRunId() + " entranceUri:" + recordInterface.getUniqueKey() + " " + e.getMessage(), e);
             return null;
         }
     }
@@ -142,35 +143,42 @@ public class RecordRedisServiceImpl implements RecordRedisService {
 
     @Override
     public void updateUniqueStringToRedis(UniqModel uniqModel) {
-        jedisCluster.setex(uniqModel.getUniqKey(),24 * 60 * 60,"XXXX");
+
+        try (Jedis jedis = jedisPool.getResource()){
+            jedis.setex(uniqModel.getUniqKey(),24 * 60 * 60,"XXXX");
+        }
+
     }
 
     @Override
     public void saveRecordTraceToRedis(String taskRunId, String traceId) {
         String cacheKey = "record_trace_prefix_" + taskRunId;
-        jedisCluster.rpush(cacheKey, traceId);
+
+        try (Jedis jedis = jedisPool.getResource()){
+            jedis.rpush(cacheKey, traceId);
+        }
     }
 
     @Override
     public List<String> getRecordTracesFromRedis(String replayTaskRunId, String recordTaskRunId, int size) {
         String replayKey = "replay_position_cache_prefix_" + replayTaskRunId;
-        String position = jedisCluster.get(replayKey);
-        long startPos = 0L;
-        if (StringUtils.isNotBlank(position)) {
-            startPos = Long.parseLong(position);
-        }
-        long  stopPos=startPos+size-1;
-        String recordKey = "record_trace_prefix_" + recordTaskRunId;
-        List<String> result = jedisCluster.lrange(recordKey, startPos, stopPos);
+        try (Jedis jedis = jedisPool.getResource()){
+            String position = jedis.get(replayKey);
+            long startPos = 0L;
+            if (StringUtils.isNotBlank(position)) {
+                startPos = Long.parseLong(position);
+            }
+            long  stopPos=startPos+size-1;
+            String recordKey = "record_trace_prefix_" + recordTaskRunId;
+            List<String> result = jedis.lrange(recordKey, startPos, stopPos);
 
-        log.info("getRecordTracesFromRedis taskRunId:{},startPos:{},endPos:{},resultSize:{}",recordTaskRunId
-        ,startPos,stopPos,result.size());
-
-        if (CollectionUtils.isEmpty(result)) {
+            if (CollectionUtils.isEmpty(result)) {
+                return result;
+            }
+            jedis.incrBy(replayKey, result.size());
             return result;
         }
-        jedisCluster.incrBy(replayKey, result.size());
-        return result;
+
     }
 
 
@@ -192,7 +200,6 @@ public class RecordRedisServiceImpl implements RecordRedisService {
      * @throws Exception 异常信息
      */
     private static List<Object> getRequestFields(RecordWrapper recordWrapper,List<String>dataFields,String jsonRequest)throws Exception{
-        log.info("getRequestFieldsStartParam");
         List<Object>values;
         if (recordWrapper.getEntranceInvocation().getType().getInvokeName().equals(InvokeType.HTTP.getInvokeName())) {
             Serializer hessian = SerializerProvider.instance().provide(Serializer.Type.HESSIAN);
@@ -216,8 +223,7 @@ public class RecordRedisServiceImpl implements RecordRedisService {
             List<Object> finalValues = values;
             dataFields.forEach(s -> finalValues.add(documentContext.read(s)));
         }
-        log.info("getRequestFieldsEndParam:{}",values);
-        return values;
+       return values;
 
     }
 

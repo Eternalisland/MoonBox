@@ -29,9 +29,58 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "spring.redis")
 public class RedisProperties {
 
+    public int getExpireSeconds() {
+        return expireSeconds;
+    }
+
+    public void setExpireSeconds(int expireSeconds) {
+        this.expireSeconds = expireSeconds;
+    }
+
+    public String getClusterNodes() {
+        return clusterNodes;
+    }
+
+    public void setClusterNodes(String clusterNodes) {
+        this.clusterNodes = clusterNodes;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getCommandTimeout() {
+        return commandTimeout;
+    }
+
+    public void setCommandTimeout(int commandTimeout) {
+        this.commandTimeout = commandTimeout;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
     private int    expireSeconds;
     private String clusterNodes;
     private String password = null;
     private String host;
     private int    commandTimeout;
+    private int    port;
 }

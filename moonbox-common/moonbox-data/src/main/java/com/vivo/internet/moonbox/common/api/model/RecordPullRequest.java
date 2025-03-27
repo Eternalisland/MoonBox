@@ -42,4 +42,29 @@ public class RecordPullRequest implements Serializable {
     private String replayTaskRunId;
 
     private String recordTaskRunId;
+    /**
+     * 组织机构
+     */
+    private String organizationId;
+    /**
+     * 按照消息集 来查询
+     */
+    private String datahubCustomerId;
+    /**
+     * 按照 messageId 来查询
+     */
+    private String messageId;
+
+    /**
+     * 按照 traceId 来回放
+     */
+    private String traceId;
+    /**
+     *
+     */
+    private int pageIndex = 1;
+    /**
+     *
+     */
+    private int pageSize = 100;
 }

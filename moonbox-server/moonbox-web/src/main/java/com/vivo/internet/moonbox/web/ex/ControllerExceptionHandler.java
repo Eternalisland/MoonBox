@@ -40,8 +40,6 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(value = Exception.class)
     public MoonBoxResult exceptionHandler(HttpServletRequest req, Exception e) {
-        log.error("请求发生业务异常！原因是：{}", e.getMessage(), e);
-        log.info("uri:{}, querystring:{}", req.getRequestURI(), req.getQueryString());
         if (DBExceptionUtils.isUniqueKeyException(e)) {
             return MoonBoxResult.createFailResponse("BIZ_EXCEPTION", "数据库唯一键异常，请使用更新");
         }

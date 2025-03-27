@@ -295,7 +295,7 @@ public class HttpUtil {
      * @return body字符串
      */
     public static Resp executeRequest(Request request) {
-        return executeRequest(request, 3);
+        return executeRequest(request, 1);
     }
 
     /**
@@ -306,8 +306,7 @@ public class HttpUtil {
      * @return body字符串
      */
     private static Resp executeRequest(Request request, int retryTime) {
-        try {
-            Response response = client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()){
             if (response.isSuccessful()) {
                 return Resp.builder().code(response.code())
                         .body(bodyToString(response.body())).build();

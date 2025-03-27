@@ -15,13 +15,28 @@ limitations under the License.
  */
 package com.vivo.jvm.sandbox.moonbox.module;
 
+import java.io.PrintWriter;
 import java.net.URLDecoder;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Resource;
 
+import com.alibaba.jvm.sandbox.api.ModuleException;
+import com.alibaba.jvm.sandbox.api.annotation.Command;
+import com.alibaba.jvm.sandbox.repeater.plugin.common.Constants;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.SerializeException;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.Serializer;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.SerializerProvider;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.*;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.wrapper.SerializerWrapper;
+import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeatMeta;
+import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeaterResult;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.BeanUtil;
+import com.vivo.internet.moonbox.common.api.model.*;
+import com.vivo.jvm.sandbox.moonbox.module.utils.DatahubRepeaterUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -50,21 +65,12 @@ import com.alibaba.jvm.sandbox.repeater.plugin.core.spring.SpringContextInnerCon
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.TraceContextMgrFactory;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.TraceTypeEnum;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.Tracer;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.MoonboxThreadPool;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.PathUtils;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.PropertyUtil;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.SysTimeUtils;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.SystemTimeAdvice;
 import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeaterConfig;
 import com.alibaba.jvm.sandbox.repeater.plugin.exception.PluginLifeCycleException;
 import com.alibaba.jvm.sandbox.repeater.plugin.spi.InvokePlugin;
 import com.alibaba.jvm.sandbox.repeater.plugin.spi.Repeater;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.vivo.internet.moonbox.common.api.model.AgentConfig;
-import com.vivo.internet.moonbox.common.api.model.InvokeType;
-import com.vivo.internet.moonbox.common.api.model.RecordAgentConfig;
-import com.vivo.internet.moonbox.common.api.model.ReplayAgentConfig;
 import com.vivo.jvm.sandbox.moonbox.module.advice.SpringInstantiateAdvice;
 import com.vivo.jvm.sandbox.moonbox.module.classloader.PluginClassLoader;
 import com.vivo.jvm.sandbox.moonbox.module.classloader.PluginClassRouting;
@@ -85,7 +91,7 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("unused")
 @Slf4j
 @MetaInfServices(Module.class)
-@Information(id = "moonbox", version = "1.0.0")
+@Information(id = "datahub-repeater", version = "1.0.0", author = "datahub")
 public class MoonboxModule implements Module, ModuleLifecycle {
 
     /**
@@ -196,9 +202,8 @@ public class MoonboxModule implements Module, ModuleLifecycle {
                 new MoonboxRepeaterTask().start();
             }
         });
-
-        heartbeatTask = new MoonboxHeartbeatTask(configInfo);
-        heartbeatTask.start();
+//        heartbeatTask = new MoonboxHeartbeatTask(configInfo);
+//        heartbeatTask.start();
     }
 
     /**
@@ -216,16 +221,17 @@ public class MoonboxModule implements Module, ModuleLifecycle {
                 repeaterConfig.setUseTtl(true);
                 log.info("use ttl flag: {}", repeaterConfig.isUseTtl());
                 // 【 RECORD MODE 】
-                if (isRecord(agentConfig.getTaskType())) {
+
+                if(isRecord(agentConfig.getTaskType())) {
                     RecordAgentConfig recordTaskConfig = agentConfig.getRecordAgentConfig();
                     this.makeUpConfigWithRecordMode(repeaterConfig, recordTaskConfig);
                     SysTimeUtils.initSysTime(false);
-                }
-                // 【 REPEAT MODE 】
-                else {
+                }else if(isReplay(agentConfig.getTaskType())) {
+                    // 【 REPEAT MODE 】
                     ReplayAgentConfig replayAgentConfig = agentConfig.getReplayAgentConfig();
                     this.makeUpConfigWithRepeatMode(repeaterConfig, replayAgentConfig);
                 }
+
                 MOONBOX_CONTEXT.setConfig(repeaterConfig);
                 // tracer init
                 initTracerAndTracerMgr(repeaterConfig);
@@ -245,12 +251,6 @@ public class MoonboxModule implements Module, ModuleLifecycle {
                             log.info("enable plugin {} success", invokePlugin.identity());
                             invokePlugin.onConfigChange(repeaterConfig);
                             invokePlugin.watch(eventWatcher, invocationListener);
-                        } else if (isReplay(agentConfig.getTaskType())
-                                && REPLAY_DEFAULT_PLUGIN_SET.contains(invokePlugin.getType().name())) {
-                            // 如果是回放的场景，默认启动spring-session插件
-                            log.info("enable plugin {} success", invokePlugin.identity());
-                            invokePlugin.onConfigChange(repeaterConfig);
-                            invokePlugin.watch(eventWatcher, invocationListener);
                         } else {
                             log.info("plugin {} is disabled", invokePlugin.identity());
                         }
@@ -262,18 +262,16 @@ public class MoonboxModule implements Module, ModuleLifecycle {
                     }
                 }
 
-                if (isReplay(agentConfig.getTaskType())) {
-                    // 装载回放器
-                    log.info("start to initialize repeater replay plugin taskRunId:{}", agentConfig.getTaskRunId());
-                    List<Repeater> repeaters = lifecycleManager.loadRepeaters();
-                    for (Repeater repeater : repeaters) {
-                        repeater.setBroadcast(broadcaster);
-                    }
-                    RepeaterBridge.instance().build(repeaters);
-                    //修改mock策略模式cache的初始化实际，修改为启动的时候初始化，运行时初始化的话：运行的classloader和插件加载的classLoader
-                    // 不是同一个，导致初始化strategyCached数据为空
-                    lifecycleManager.initMockStrategyRoute();
+                // 装载回放器
+                log.info("start to initialize repeater replay plugin taskRunId:{}", agentConfig.getTaskRunId());
+                List<Repeater> repeaters = lifecycleManager.loadRepeaters();
+                for (Repeater repeater : repeaters) {
+                    repeater.setBroadcast(broadcaster);
                 }
+                RepeaterBridge.instance().build(repeaters);
+                //修改mock策略模式cache的初始化实际，修改为启动的时候初始化，运行时初始化的话：运行的classloader和插件加载的classLoader
+                // 不是同一个，导致初始化strategyCached数据为空
+                lifecycleManager.initMockStrategyRoute();
 
                 log.info("MoonboxModule initialized successfully...");
                 try {
@@ -348,24 +346,27 @@ public class MoonboxModule implements Module, ModuleLifecycle {
 
     private void initMoonboxContext() throws Exception {
         Object cfg =FieldUtils.readField(configInfo,"cfg",true);
-        String taskRunConfig = (String) MethodUtils.invokeMethod(cfg,true,"getTaskRunConfig");
-        log.info("start initMoonboxContext config: {}", taskRunConfig);
+//        String taskRunConfig = (String) MethodUtils.invokeMethod(cfg,true,"getTaskRunConfig");
+//        log.info("start initMoonboxContext config: {}", taskRunConfig);
+
+        Map featureMap = (Map) FieldUtils.readField(cfg,"featureMap",true);
         MOONBOX_CONTEXT.setSandboxHome(configInfo.getHome());
 
         String debug = System.getProperty("repeater.debug");
         if ("true".equals(debug)) {
             MOONBOX_CONTEXT.setDebug(true);
         }
-        if (StringUtils.isBlank(taskRunConfig)) {
-            return;
-        }
 
-        String decodeStr = URLDecoder.decode(taskRunConfig, "UTF-8");
-        String[] array = decodeStr.split("&");
-        MOONBOX_CONTEXT.setTaskRunId(array[0]);
-        MOONBOX_CONTEXT.setHttpUrl(array[1]);
+        String repeaterServer = System.getProperty("datahub.repeater.server");
+        if (StringUtils.isBlank(repeaterServer)) {
+            repeaterServer = StringUtils.defaultString(System.getProperty("zkService.LocalBindingIp") , InetAddressUtils.getLocalIp())+":" + System.getProperty("zkService.port");
+        }
+//        String decodeStr = URLDecoder.decode(taskRunConfig, "UTF-8");
+//        String[] array = decodeStr.split("&");
+        MOONBOX_CONTEXT.setTaskRunId("datahub-repeater-" + UUID.randomUUID().toString().replaceAll("-",""));
+        MOONBOX_CONTEXT.setHttpUrl("http://"+ repeaterServer + "/datahubServer");
         MOONBOX_CONTEXT.setOpenStackTrace(Boolean.TRUE);
-        log.info("initMoonboxContext config array:" + JSON.toJSONString(array));
+//        log.info("initMoonboxContext config array:" + JSON.toJSONString(array));
     }
 
     private String trimUri(String uri) {
@@ -380,4 +381,135 @@ public class MoonboxModule implements Module, ModuleLifecycle {
         return taskType == 1 || taskType == 2;
     }
 
+    /**
+     * 回放http接口
+     *
+     * @param req    请求参数
+     * @param writer printWriter
+     */
+    @Command("repeat")
+    public void repeat(final Map<String, String> req, final PrintWriter writer) {
+        try {
+            String data = req.get(Constants.DATA_TRANSPORT_IDENTIFY);
+            if (StringUtils.isEmpty(data)) {
+                writer.write("invalid request, cause parameter {" + Constants.DATA_TRANSPORT_IDENTIFY + "} is required");
+                return;
+            }
+            Map<String, String> requestParams = new HashMap<String, String>(16);
+            for (Map.Entry<String, String> entry : req.entrySet()) {
+                requestParams.put(entry.getKey(), entry.getValue());
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            RecordPullRequest recordPullRequest = objectMapper.convertValue(requestParams, RecordPullRequest.class);
+            DatahubRepeaterUtils.pullAndDispatch(recordPullRequest);
+            writer.write("submit success");
+        } catch (Throwable e) {
+            writer.write(e.getMessage());
+        }
+    }
+
+    /**
+     * 重新加载插件
+     *
+     * @param req    请求参数
+     * @param writer printWriter
+     */
+    @Command("reload")
+    public void reload(final Map<String, String> req, final PrintWriter writer) {
+        try {
+            if (initialized.compareAndSet(true,false)) {
+                reload();
+                initialized.compareAndSet(false, true);
+            }
+        } catch (Throwable throwable) {
+            writer.write(throwable.getMessage());
+            initialized.compareAndSet(false, true);
+        }
+    }
+
+    private synchronized void reload() throws ModuleException {
+        moduleController.frozen();
+        // unwatch all plugin
+        MoonboxConfigManager configManager = MoonboxConfigManager.getInstance();
+        AgentConfig agentConfig = configManager.pullConfig();
+        if (null == agentConfig) {
+            log.error("get task config context fail!");
+            return;
+        }
+        for (InvokePlugin invokePlugin : lifecycleManager.loadInvokePlugins()) {
+            if (invokePlugin.enable(MoonboxContext.getInstance().getConfig())) {
+                invokePlugin.unWatch(eventWatcher, invocationListener);
+            }
+        }
+        // release classloader
+        lifecycleManager.release();
+        // reWatch
+        initialize(agentConfig);
+        moduleController.active();
+    }
+
+    /**
+     * 回放http接口(暴露JSON回放）
+     *
+     * @param req    请求参数
+     * @param writer printWriter
+     */
+    @Command("repeatWithJson")
+    public void repeatWithJson(final Map<String, String> req, final PrintWriter writer) {
+        try {
+            String data = req.get(Constants.DATA_TRANSPORT_IDENTIFY);
+            if (StringUtils.isEmpty(data)) {
+                writer.write("invalid request, cause parameter {" + Constants.DATA_TRANSPORT_IDENTIFY + "} is required");
+                return;
+            }
+            RepeatMeta meta = SerializerProvider.instance().provide(Serializer.Type.JSON).deserialize(data, RepeatMeta.class);
+            req.put(Constants.DATA_TRANSPORT_IDENTIFY, SerializerProvider.instance().provide(Serializer.Type.HESSIAN).serialize2String(meta));
+            repeat(req, writer);
+        } catch (Throwable e) {
+            writer.write(e.getMessage());
+        }
+    }
+
+    /**
+     * 配置推送接口
+     *
+     * @param req    请求参数
+     * @param writer printWriter
+     */
+    @Command("pushConfig")
+    public void pushConfig(final Map<String, String> req, final PrintWriter writer) {
+        String data = req.get(Constants.DATA_TRANSPORT_IDENTIFY);
+        if (StringUtils.isEmpty(data)) {
+            writer.write("invalid request, cause parameter {" + Constants.DATA_TRANSPORT_IDENTIFY + "} is required");
+            return;
+        }
+        try {
+            RepeaterConfig config = SerializerWrapper.hessianDeserialize(data, RepeaterConfig.class);
+            MoonboxContext.getInstance().setConfig(config);
+            noticeConfigChange(config);
+            writer.write("config push success");
+        } catch (SerializeException e) {
+            writer.write("invalid request, cause deserialize config failed, reason = {" + e.getMessage() + "}");
+        }
+    }
+
+    /**
+     * 通知配置变更
+     *
+     * @param config 配置文件
+     */
+    private void noticeConfigChange(final RepeaterConfig config) {
+        if (initialized.get()) {
+            for (InvokePlugin invokePlugin :  lifecycleManager.loadInvokePlugins()) {
+                try {
+                    if (invokePlugin.enable(config)) {
+                        invokePlugin.onConfigChange(config);
+                    }
+                } catch (PluginLifeCycleException e) {
+                    log.error("error occurred when notice config, plugin ={}", invokePlugin.getType().name(), e);
+                }
+            }
+        }
+    }
 }

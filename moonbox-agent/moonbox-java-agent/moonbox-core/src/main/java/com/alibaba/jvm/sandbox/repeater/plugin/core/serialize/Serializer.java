@@ -130,6 +130,7 @@ public interface Serializer {
         HESSIAN,
         JSON,
         JAVA,
+        KRYO,
         NONE
     }
 }

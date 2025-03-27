@@ -31,6 +31,6 @@ public class RedisPropCondition extends SpringBootCondition implements Condition
         // 使用环境变量来决定条件是否满足
         String myProperty = env.getProperty("spring.redis.clusterNodes");
         //IP-PORT校验
-        return new ConditionOutcome(Pattern.matches(IP_PORT_PATTERN, myProperty), "");
+        return  new ConditionOutcome( true , "");
     }
 }

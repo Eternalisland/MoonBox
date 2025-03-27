@@ -16,6 +16,15 @@ import com.alibaba.jvm.sandbox.repeater.plugin.Difference;
  */
 public class RepeatModel implements java.io.Serializable {
 
+    /**
+     * 组织机构
+     */
+    private String organizationId;
+
+    private String datahubCustomerId;
+
+    private String messageId;
+
     private String repeatId;
 
     /**
@@ -153,5 +162,29 @@ public class RepeatModel implements java.io.Serializable {
                 + ", recordTaskRunId='" + recordTaskRunId + '\'' + ", recordTraceId='" + recordTraceId + '\''
                 + ", status=" + status + ", response=" + response + ", diffs=" + diffs + ", cost=" + cost
                 + ", traceId='" + traceId + '\'' + ", mockInvocations=" + mockInvocations + '}';
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getDatahubCustomerId() {
+        return datahubCustomerId;
+    }
+
+    public void setDatahubCustomerId(String datahubCustomerId) {
+        this.datahubCustomerId = datahubCustomerId;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 }

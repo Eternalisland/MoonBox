@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ###!/usr/bin/env bash
 
 PROJECT_HOME_DIR=../../../
 LOCAL_AGENT_DIR=${PROJECT_HOME_DIR}/local-agent
@@ -28,7 +28,7 @@ mkdir -p ${REPEATER_TARGET_DIR}/plugins
 mkdir -p ${REPEATER_TARGET_DIR}/cfg
 cp -r ../cfg ${REPEATER_TARGET_DIR} \
     && cp ../moonbox-module/target/moonbox-module-*-jar-with-dependencies.jar ${REPEATER_TARGET_DIR}/ \
-    && cp ../moonbox-plugins/*/*-plugin/target/*-jar-with-dependencies.jar ${REPEATER_TARGET_DIR}/plugins/ \
+    && cp ../moonbox-plugins/*/*-repeater/target/*-SNAPSHOT.jar ${REPEATER_TARGET_DIR}/plugins/ \
     && cp -r ../bin/ ${REPEATER_TARGET_DIR}
 
 # install repeater
@@ -37,4 +37,4 @@ cp -rf ../target/.sandbox-module/* ~/.sandbox-module/
 
 # output zip file moobox-agent.zip
 cd ../target/.sandbox-module
-tar -zcf  monbox-agent.tar ../
+tar -zcf  datahub-agent.tar ../

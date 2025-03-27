@@ -30,6 +30,12 @@ import java.util.List;
 @Data
 public class RecordModel implements java.io.Serializable {
 
+    private String organizationId;
+
+    private String datahubCustomerId;
+
+    private String messageId;
+
     private long timestamp;
 
     private String taskRunId;

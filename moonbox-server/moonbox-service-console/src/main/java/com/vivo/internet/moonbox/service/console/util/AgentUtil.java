@@ -40,7 +40,7 @@ import java.net.URLEncoder;
 @Slf4j
 public class AgentUtil {
 
-    private static String SANDBOX_JVM_OPS = "-Xms128M -Xmx128M -Xnoclassgc -ea -Xbootclasspath/a:%slib" + File.separator + "tools.jar";
+    private static String SANDBOX_JVM_OPS = "-Xms128M -Xmx128M -Xnoclassgc -ea \"-Xbootclasspath/a:%slib" + File.separator + "tools.jar\"";
 
     public static String SANDBOX_HOME = System.getProperty("user.home") + File.separator + "sandbox";
 

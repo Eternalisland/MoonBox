@@ -52,6 +52,9 @@ public class DefaultInvocationListener implements InvocationListener {
 
     private RecordModel makeUpRecordModel(Invocation invocation) {
         RecordModel recordModel = new RecordModel();
+        recordModel.setOrganizationId(invocation.getOrganizationId());
+        recordModel.setDatahubCustomerId(invocation.getDatahubCustomerId());
+        recordModel.setMessageId(invocation.getMessageId());
         recordModel.setAppName(MOONBOX_CONTEXT.getAppName());
         recordModel.setEnvironment(MOONBOX_CONTEXT.getEnvironment());
         recordModel.setHost(MOONBOX_CONTEXT.getHost());

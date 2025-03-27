@@ -69,7 +69,6 @@ public class JavaRepeater extends AbstractRepeater {
         } else {
             method = bean.getClass().getDeclaredMethod(methodName);
         }
-
         // 这里没法办像HTTP、DUBBO透传traceId，因此在执行前先执行Trace.start()，根据traceId创建好TraceContext，避免在
         Tracer.start(context.getTraceId());
 

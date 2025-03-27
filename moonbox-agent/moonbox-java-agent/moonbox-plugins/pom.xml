@@ -13,8 +13,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>moonbox/apache-http-client-plugin</module>
-        <module>moonbox/caffeine-cache-plugin</module>
+        <module>moonbox/flux-collaboration-storage-repeater</module>
+      <!--  <module>moonbox/caffeine-cache-plugin</module>
         <module>moonbox/date-time-plugin</module>
         <module>moonbox/eh-cache-plugin</module>
         <module>moonbox/elasticsearch-plugin</module>
@@ -28,8 +28,8 @@
         <module>moonbox/spring-session-plugin</module>
         <module>moonbox/universal-plugin</module>
         <module>moonbox/motan-plugin</module>
-        <module>moonbox/tars-plugin</module>
-        <module>moonbox/hbase-plugin</module>
+&lt;!&ndash;        <module>moonbox/tars-plugin</module>&ndash;&gt;
+      &lt;!&ndash;  <module>moonbox/hbase-plugin</module>&ndash;&gt;
         <module>repeater/dubbo-plugin</module>
         <module>repeater/hibernate-plugin</module>
         <module>repeater/http-plugin</module>
@@ -38,7 +38,7 @@
         <module>repeater/mybatis-plugin</module>
         <module>repeater/redis-plugin</module>
         <module>repeater/socketio-plugin</module>
-        <module>repeater/spring-data-jpa-plugin</module>
+        <module>repeater/spring-data-jpa-plugin</module>-->
     </modules>
 
     <dependencies>

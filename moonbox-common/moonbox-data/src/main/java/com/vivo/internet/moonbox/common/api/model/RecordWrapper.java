@@ -14,6 +14,9 @@ import java.util.List;
  */
 public class RecordWrapper {
 
+    private String organizationId;
+    private String datahubCustomerId;
+    private String messageId;
     private long timestamp;
 
     private long cost;
@@ -44,6 +47,9 @@ public class RecordWrapper {
     public RecordWrapper() {}
 
     public RecordWrapper(RecordModel recordModel) {
+        this.organizationId = recordModel.getOrganizationId();
+        this.datahubCustomerId = recordModel.getDatahubCustomerId();
+        this.messageId = recordModel.getMessageId();
         this.timestamp = recordModel.getTimestamp();
         this.taskRunId = recordModel.getTaskRunId();
         this.appName = recordModel.getAppName();
@@ -62,12 +68,22 @@ public class RecordWrapper {
      */
     public RecordModel reTransform() {
         RecordModel recordModel = new RecordModel();
+
+        recordModel.setOrganizationId(this.getOrganizationId());
+        recordModel.setDatahubCustomerId(this.getDatahubCustomerId());
+        recordModel.setMessageId(this.getMessageId());
+
         recordModel.setTimestamp(this.timestamp);
 
         // add by zlqian
         recordModel.setTaskRunId(this.taskRunId);
 
         recordModel.setTraceId(this.traceId);
+
+        recordModel.setOrganizationId(this.organizationId);
+        recordModel.setDatahubCustomerId(this.datahubCustomerId);
+        recordModel.setMessageId(this.messageId);
+
 
         recordModel.setAppName(this.appName);
         recordModel.setEnvironment(this.environment);
@@ -155,5 +171,29 @@ public class RecordWrapper {
 
     public void setTaskRunId(String taskRunId) {
         this.taskRunId = taskRunId;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getDatahubCustomerId() {
+        return datahubCustomerId;
+    }
+
+    public void setDatahubCustomerId(String datahubCustomerId) {
+        this.datahubCustomerId = datahubCustomerId;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 }

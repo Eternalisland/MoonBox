@@ -94,8 +94,8 @@ public class MoonboxContext {
 
     private MoonboxContext() {
         // for example, you can define it your self
-        this.appName = PropertyUtil.getSystemPropertyOrDefault("app.name", "unknown");
-        this.environment = PropertyUtil.getSystemPropertyOrDefault("app.env", "unknown");
+        this.appName = PropertyUtil.getSystemPropertyOrDefault("app.name", "datahub-repeater");
+        this.environment = PropertyUtil.getSystemPropertyOrDefault("app.env", "dev");
         this.host = InetAddressUtils.getLocalIp();
     }
 

@@ -44,6 +44,17 @@ public class MoonboxRecordCache {
                 }
             });
 
+    private static final LoadingCache<String, Invocation> ENTRANCE_INVOCATION_CACHE = CacheBuilder
+            .newBuilder()
+            .maximumSize(4096)
+            .expireAfterWrite(MOONBOX_CONTEXT.isDebug() ? 3600 : 10, TimeUnit.SECONDS)
+            .build(new CacheLoader<String, Invocation>() {
+                @Override
+                public Invocation load(String key) {
+                    return new Invocation();
+                }
+            });
+
     private static final LoadingCache<String, Lock> TRACE_ID_LOCK_CACHE = CacheBuilder
             .newBuilder()
             .maximumSize(32)
@@ -215,6 +226,7 @@ public class MoonboxRecordCache {
             ContextResourceClear.sampleFalse();
         } finally {
             INVOCATION_CACHE.invalidate(invocation.getInvokeId());
+            removeEntranceInvocationCache(invocation.getTraceId());
         }
     }
 
@@ -236,8 +248,42 @@ public class MoonboxRecordCache {
         if (StringUtils.isBlank(traceId)) {
             return;
         }
-
         SUB_INVOCATION_CACHE.invalidate(traceId);
         TRACE_ID_LOCK_CACHE.invalidate(traceId);
+        ENTRANCE_INVOCATION_CACHE.invalidate(traceId);
+    }
+
+
+    /**
+     *
+     * @param traceId
+     * @param invocation
+     */
+    public static void cacheEntranceInvocationCache(String traceId,Invocation invocation){
+        if (StringUtils.isBlank(traceId)) {
+            return;
+        }
+        ENTRANCE_INVOCATION_CACHE.put(traceId, invocation);
+    }
+
+    public static void removeEntranceInvocationCache(String traceId){
+        if (StringUtils.isBlank(traceId)) {
+            return;
+        }
+        ENTRANCE_INVOCATION_CACHE.invalidate(traceId);
+    }
+
+    /**
+     *
+     * @param traceId
+     * @return
+     */
+    public static Invocation getEntranceInvocationCacheIfPresent(String traceId){
+        try {
+            return ENTRANCE_INVOCATION_CACHE.getIfPresent(traceId);
+        } catch (Exception e) {
+            log.warn("get invocation exception", e);
+            return null;
+        }
     }
 }
