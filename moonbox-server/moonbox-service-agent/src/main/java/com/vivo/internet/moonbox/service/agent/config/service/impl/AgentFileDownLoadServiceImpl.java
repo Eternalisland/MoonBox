@@ -21,11 +21,11 @@ import com.vivo.internet.moonbox.dal.mapper.AgentFileMapper;
 import com.vivo.internet.moonbox.service.agent.config.service.AgentFileDownLoadService;
 import com.vivo.internet.moonbox.service.common.ex.BusiException;
 import com.vivo.internet.moonbox.service.common.utils.AgentFileUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;

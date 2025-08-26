@@ -15,17 +15,35 @@
     <packaging>pom</packaging>
 
     <properties>
-        <lombok.version>1.18.8</lombok.version>
-        <sandbox.api.version>1.2.0</sandbox.api.version>
-        <org.slf4j.version>1.7.24</org.slf4j.version>
-        <logback.version>1.2.1</logback.version>
-        <ttl.version>2.10.2</ttl.version>
-        <fastjson.version>1.2.83</fastjson.version>
-        <commons-lang3.version>3.6</commons-lang3.version>
-        <commons-csv.version>1.7</commons-csv.version>
+        <lombok.version>1.18.30</lombok.version>
+        <sandbox.api.version>1.4.0</sandbox.api.version>
+<!--        <org.slf4j.version>1.7.24</org.slf4j.version>-->
+<!--        <logback.version>1.2.1</logback.version>-->
+<!--        <ttl.version>2.10.2</ttl.version>-->
+<!--        <fastjson.version>1.2.83</fastjson.version>-->
+<!--        <commons-lang3.version>3.6</commons-lang3.version>-->
+<!--        <commons-csv.version>1.7</commons-csv.version>-->
+        <!-- SLF4J (日志门面) -->
+        <org.slf4j.version>2.0.7</org.slf4j.version>
+
+        <!-- Logback (日志实现) -->
+        <logback.version>1.4.7</logback.version>
+
+        <!-- TransmittableThreadLocal (阿里线程上下文传递) -->
+        <ttl.version>2.14.0</ttl.version>
+
+        <!-- Fastjson (阿里JSON库) -->
+        <fastjson.version>2.0.34</fastjson.version>
+
+        <!-- Apache Commons Lang3 -->
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <org.ow2.asm.version>9.8</org.ow2.asm.version>
+
+        <!-- Apache Commons CSV -->
+        <commons-csv.version>1.10.0</commons-csv.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <metainf-services.version>1.8</metainf-services.version>
+        <metainf-services.version>1.11</metainf-services.version>
     </properties>
 
     <modules>
@@ -95,16 +113,32 @@
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.vivo.internet</groupId>
-                <artifactId>moonbox-hessian-lite</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.vivo.internet</groupId>-->
+<!--                <artifactId>moonbox-hessian-lite</artifactId>-->
+<!--                <version>1.0.0-SNAPSHOT</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>com.vivo.internet</groupId>
                 <artifactId>moonbox-data</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${org.ow2.asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-commons</artifactId>
+                <version>${org.ow2.asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-util</artifactId>
+                <version>${org.ow2.asm.version}</version>
             </dependency>
 
         </dependencies>
@@ -119,6 +153,10 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                        <arg>--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

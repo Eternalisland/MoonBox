@@ -43,11 +43,11 @@
             <artifactId>metainf-services</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-api</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.vivo.internet</groupId>
             <artifactId>moonbox-api</artifactId>
@@ -84,10 +84,10 @@
             <artifactId>sandbox-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.vivo.internet</groupId>
-            <artifactId>moonbox-hessian-lite</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.vivo.internet</groupId>-->
+<!--            <artifactId>moonbox-hessian-lite</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.vivo.internet</groupId>
             <artifactId>moonbox-data</artifactId>

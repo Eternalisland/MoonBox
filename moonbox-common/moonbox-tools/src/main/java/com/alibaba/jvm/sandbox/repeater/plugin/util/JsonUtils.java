@@ -15,12 +15,11 @@ limitations under the License.
  */
 package com.alibaba.jvm.sandbox.repeater.plugin.util;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +37,6 @@ public class JsonUtils {
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
         objectMapper.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true);
-        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(DeserializationConfig.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
 
     public static <T> T readObject(String json, Class<T> clz)throws Exception{
@@ -88,9 +85,9 @@ public class JsonUtils {
             } else if (clazz == Integer.class) {
                 return (T) Integer.valueOf(readTree.asInt());
             } else if (clazz == Float.class) {
-                return (T) new Float(readTree.asDouble());
+                return (T) Float.valueOf( Double.valueOf(readTree.asDouble()).floatValue());
             } else if (clazz == Double.class) {
-                return (T) new Double(readTree.asDouble());
+                return (T) Double.valueOf(readTree.asDouble());
             } else if (clazz == String.class) {
                 return (T) readTree.asText();
             } else if(clazz == Boolean.class) {

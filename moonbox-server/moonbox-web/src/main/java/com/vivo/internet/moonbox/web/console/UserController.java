@@ -15,7 +15,7 @@ limitations under the License.
  */
 package com.vivo.internet.moonbox.web.console;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

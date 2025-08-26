@@ -15,7 +15,8 @@ limitations under the License.
  */
 package com.vivo.internet.moonbox.service.agent.config.service;
 
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * AgentFileDownLoadService - {@link AgentFileDownLoadService}
@@ -31,5 +32,5 @@ public interface AgentFileDownLoadService {
      * @param fileName 文件名称
      * @param httpServletResponse httpServletResponse
      */
-    void downLoadFile(HttpServletResponse httpServletResponse,String fileName);
+    void downLoadFile(HttpServletResponse httpServletResponse, String fileName);
 }

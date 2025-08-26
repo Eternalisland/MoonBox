@@ -98,6 +98,10 @@ public class SerializerWrapper {
         return provider.provide(Type.HESSIAN).deserialize(sequence, tClass);
     }
 
+    public static <T> T hessianDeserialize(String sequence, Class<T> tClass,ClassLoader classLoader) throws SerializeException {
+        return provider.provide(Type.HESSIAN).deserialize(sequence, tClass,classLoader);
+    }
+
     /**
      * hessian反序列化
      *

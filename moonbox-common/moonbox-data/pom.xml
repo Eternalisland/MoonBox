@@ -18,7 +18,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.jcraft</groupId>
+            <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
         </dependency>
         <dependency>
@@ -49,11 +49,11 @@
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.vivo.internet</groupId>
-            <artifactId>moonbox-hessian-lite</artifactId>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.vivo.internet</groupId>-->
+<!--            <artifactId>moonbox-hessian-lite</artifactId>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.vivo.internet</groupId>
             <artifactId>moonbox-tools</artifactId>
@@ -81,8 +81,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>17</source>
+                <target>17</target>
                 </configuration>
             </plugin>
             <plugin>

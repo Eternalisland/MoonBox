@@ -16,11 +16,11 @@ limitations under the License.
 package com.vivo.internet.moonbox.web.ex;
 
 import com.vivo.internet.moonbox.common.api.dto.MoonBoxResult;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author 11112487

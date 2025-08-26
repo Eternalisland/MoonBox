@@ -3,15 +3,6 @@ This code comes from the jvm-sandbox-repeater(link:https://github.com/alibaba/jv
  */
 package com.alibaba.jvm.sandbox.repeater.plugin;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.jvm.sandbox.repeater.plugin.comparator.Comparator;
 import com.alibaba.jvm.sandbox.repeater.plugin.cycle.CycleReferenceDetector;
@@ -19,8 +10,11 @@ import com.alibaba.jvm.sandbox.repeater.plugin.cycle.CycleReferenceException;
 import com.alibaba.jvm.sandbox.repeater.plugin.path.JsonPathLocator;
 import com.alibaba.jvm.sandbox.repeater.plugin.path.Path;
 import com.alibaba.jvm.sandbox.repeater.plugin.path.PathLocator;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * {@link IntegratedComparator}

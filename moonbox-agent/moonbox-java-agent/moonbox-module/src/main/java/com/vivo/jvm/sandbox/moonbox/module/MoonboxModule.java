@@ -15,38 +15,11 @@ limitations under the License.
  */
 package com.vivo.jvm.sandbox.moonbox.module;
 
-import java.io.PrintWriter;
-import java.net.URLDecoder;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.Resource;
-
-import com.alibaba.jvm.sandbox.api.ModuleException;
-import com.alibaba.jvm.sandbox.api.annotation.Command;
-import com.alibaba.jvm.sandbox.repeater.plugin.common.Constants;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.SerializeException;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.Serializer;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.SerializerProvider;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.*;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.wrapper.SerializerWrapper;
-import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeatMeta;
-import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeaterResult;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.BeanUtil;
-import com.vivo.internet.moonbox.common.api.model.*;
-import com.vivo.jvm.sandbox.moonbox.module.utils.DatahubRepeaterUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.kohsuke.MetaInfServices;
-
-import com.alibaba.fastjson.JSON;
 import com.alibaba.jvm.sandbox.api.Information;
 import com.alibaba.jvm.sandbox.api.Module;
+import com.alibaba.jvm.sandbox.api.ModuleException;
 import com.alibaba.jvm.sandbox.api.ModuleLifecycle;
+import com.alibaba.jvm.sandbox.api.annotation.Command;
 import com.alibaba.jvm.sandbox.api.resource.ConfigInfo;
 import com.alibaba.jvm.sandbox.api.resource.LoadedClassDataSource;
 import com.alibaba.jvm.sandbox.api.resource.ModuleController;
@@ -55,29 +28,48 @@ import com.alibaba.jvm.sandbox.repeater.plugin.api.Broadcaster;
 import com.alibaba.jvm.sandbox.repeater.plugin.api.InvocationListener;
 import com.alibaba.jvm.sandbox.repeater.plugin.api.LifecycleManager;
 import com.alibaba.jvm.sandbox.repeater.plugin.api.TraceContextManager;
+import com.alibaba.jvm.sandbox.repeater.plugin.common.Constants;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.StandaloneSwitch;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.ClassloaderBridge;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.RepeaterBridge;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.impl.api.DefaultInvocationListener;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.impl.api.MoonboxConfigManager;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.model.MoonboxContext;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.SerializeException;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.Serializer;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.SerializerProvider;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.spring.SpringContextInnerContainer;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.TraceContextMgrFactory;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.TraceTypeEnum;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.Tracer;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.*;
+import com.alibaba.jvm.sandbox.repeater.plugin.core.wrapper.SerializerWrapper;
+import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeatMeta;
 import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeaterConfig;
 import com.alibaba.jvm.sandbox.repeater.plugin.exception.PluginLifeCycleException;
 import com.alibaba.jvm.sandbox.repeater.plugin.spi.InvokePlugin;
 import com.alibaba.jvm.sandbox.repeater.plugin.spi.Repeater;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.vivo.internet.moonbox.common.api.model.*;
 import com.vivo.jvm.sandbox.moonbox.module.advice.SpringInstantiateAdvice;
 import com.vivo.jvm.sandbox.moonbox.module.classloader.PluginClassLoader;
 import com.vivo.jvm.sandbox.moonbox.module.classloader.PluginClassRouting;
 import com.vivo.jvm.sandbox.moonbox.module.impl.JarFileLifeCycleManager;
+import com.vivo.jvm.sandbox.moonbox.module.utils.DatahubRepeaterUtils;
 import com.vivo.jvm.sandbox.moonbox.module.utils.SpecialHandlingConfigHelper;
-
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.kohsuke.MetaInfServices;
+
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * MoonModule

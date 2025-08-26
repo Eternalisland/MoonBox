@@ -3,12 +3,12 @@ This code comes from the jvm-sandbox-repeater(link:https://github.com/alibaba/jv
  */
 package com.alibaba.jvm.sandbox.repeater.plugin;
 
-import java.util.List;
-
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.jvm.sandbox.repeater.plugin.path.JsonPathLocator;
 import com.alibaba.jvm.sandbox.repeater.plugin.path.Path;
+
+import java.util.List;
 
 /**
  * {@link Difference}

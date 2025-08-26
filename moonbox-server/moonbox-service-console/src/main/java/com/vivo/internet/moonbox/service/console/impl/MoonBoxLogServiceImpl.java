@@ -21,7 +21,7 @@ import com.vivo.internet.moonbox.service.console.MoonBoxLogService;
 import com.vivo.internet.moonbox.service.console.vo.MoonBoxLogVO;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -19,7 +19,7 @@
 
     <modules>
         <module>moonbox-data</module>
-        <module>moonbox-hessian-lite</module>
+<!--        <module>moonbox-hessian-lite</module>-->
         <module>moonbox-tools</module>
     </modules>
 

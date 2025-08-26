@@ -26,9 +26,9 @@ import java.util.concurrent.ThreadPoolExecutor.DiscardPolicy;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -121,8 +121,8 @@ public class RecordTaskRunStopSchedule {
         public NamedThreadFactory(String prefix, boolean daemon) {
             mPrefix = prefix + "-thread-";
             mDaemon = daemon;
-            SecurityManager s = System.getSecurityManager();
-            mGroup = (s == null) ? Thread.currentThread().getThreadGroup() : s.getThreadGroup();
+//            SecurityManager s = System.getSecurityManager();
+            mGroup = Thread.currentThread().getThreadGroup() ; // (s == null) ? : s.getThreadGroup();
         }
 
         @Override

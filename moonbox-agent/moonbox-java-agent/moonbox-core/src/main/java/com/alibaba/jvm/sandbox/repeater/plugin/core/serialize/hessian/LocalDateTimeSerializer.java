@@ -3,8 +3,9 @@ This code comes from the jvm-sandbox-repeater(link:https://github.com/alibaba/jv
  */
 package com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.hessian;
 
-import com.caucho.hessian.io.AbstractHessianOutput;
-import com.caucho.hessian.io.AbstractSerializer;
+
+import com.alibaba.com.caucho.hessian.io.AbstractHessianOutput;
+import com.alibaba.com.caucho.hessian.io.AbstractSerializer;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

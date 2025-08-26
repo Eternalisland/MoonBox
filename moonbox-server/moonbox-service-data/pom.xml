@@ -28,10 +28,10 @@
             <groupId>com.vivo.internet</groupId>
             <artifactId>moonbox-tools</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.vivo.internet</groupId>
-            <artifactId>moonbox-hessian-lite</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.vivo.internet</groupId>-->
+<!--            <artifactId>moonbox-hessian-lite</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>

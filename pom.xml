@@ -17,29 +17,29 @@
     <description>moonbox opensource</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <spring.boot.version>2.5.14</spring.boot.version>
-        <spring.version>5.1.10.RELEASE</spring.version>
-        <tomcat.version>8.5.54</tomcat.version>
-		<org.slf4j.version>1.7.24</org.slf4j.version>
-		<logback.version>1.2.1</logback.version>
-        <elasticsearch.version>7.17.1</elasticsearch.version>
-        <jackson-core.version>2.14.0</jackson-core.version>
-        <jackson-databind.version>2.14.0</jackson-databind.version>
+        <java.version>17</java.version>
+        <spring.boot.version>3.4.5</spring.boot.version>
+        <spring.version>6.2.6</spring.version>
+        <tomcat.version>10.1.44</tomcat.version>
+		<org.slf4j.version>2.0.17</org.slf4j.version>
+		<logback.version>1.5.18</logback.version>
+        <elasticsearch.version>7.17.29</elasticsearch.version>
+        <jackson-core.version>2.18.3</jackson-core.version>
+        <jackson-databind.version>2.18.3</jackson-databind.version>
         <testng.version>6.14.3</testng.version>
-        <commons-collections4.version>4.1</commons-collections4.version>
-        <okhttp.version>3.9.0</okhttp.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <!--打包相关-->
         <maven.surefire.plugin>3.0.0-M4</maven.surefire.plugin>
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
-        <jsch.version>0.1.55</jsch.version>
-        <apache.common.lang.version>3.12.0</apache.common.lang.version>
-        <apache.common.io.version>2.11.0</apache.common.io.version>
-        <lombok.version>1.18.24</lombok.version>
-        <sandbox.api.version>1.2.0</sandbox.api.version>
-        <guava.version>23.0</guava.version>
-        <page.helper>5.3.1</page.helper>
-        <metainf-services>1.8</metainf-services>
+        <jsch.version>2.27.2</jsch.version>
+        <apache.common.lang.version>3.18.0</apache.common.lang.version>
+        <apache.common.io.version>2.20.0</apache.common.io.version>
+        <lombok.version>1.18.30</lombok.version>
+        <sandbox.api.version>1.4.0</sandbox.api.version>
+        <guava.version>33.4.8-jre</guava.version>
+        <page.helper>5.3.3</page.helper>
+        <metainf-services>1.11</metainf-services>
         <sandbox.version>1.4.0</sandbox.version>
     </properties>
 
@@ -113,8 +113,9 @@
             </dependency>
             <!--Util-->
             <!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
+            <!-- https://mvnrepository.com/artifact/com.github.mwiede/jsch -->
             <dependency>
-                <groupId>com.jcraft</groupId>
+                <groupId>com.github.mwiede</groupId>
                 <artifactId>jsch</artifactId>
                 <version>${jsch.version}</version>
             </dependency>
@@ -202,11 +203,11 @@
                 <artifactId>moonbox-tools</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.vivo.internet</groupId>
-                <artifactId>moonbox-hessian-lite</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.vivo.internet</groupId>-->
+<!--                <artifactId>moonbox-hessian-lite</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <artifactId>moonbox-service-common</artifactId>
                 <groupId>com.vivo.internet</groupId>
@@ -237,6 +238,11 @@
                 <groupId>com.alibaba.jvm.sandbox</groupId>
                 <artifactId>sandbox-agent</artifactId>
                 <version>1.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

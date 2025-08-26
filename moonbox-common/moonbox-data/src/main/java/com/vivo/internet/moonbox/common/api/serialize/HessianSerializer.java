@@ -7,9 +7,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
+import com.alibaba.com.caucho.hessian.io.Hessian2Input;
+import com.alibaba.com.caucho.hessian.io.Hessian2Output;
+import com.alibaba.com.caucho.hessian.io.SerializerFactory;
 import org.kohsuke.MetaInfServices;
 
-import com.caucho.hessian.io.*;
 import com.google.common.collect.Maps;
 
 /**
@@ -110,10 +112,10 @@ public class HessianSerializer extends AbstractSerializerAdapter {
 
     private void registerCustomFactory(SerializerFactory factory) {
         // try to register jdk8time
-        if (isJava8()) {
-            factory.addFactory(new Java8TimeSerializerFactory());
-        }
-        // add big decimal factory
-        factory.addFactory(new BigDecimalSerializerFactory());
+//        if (isJava8()) {
+//            factory.addFactory(new Java8TimeSerializerFactory());
+//        }
+//        // add big decimal factory
+//        factory.addFactory(new BigDecimalSerializerFactory());
     }
 }
