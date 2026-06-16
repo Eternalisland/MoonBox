@@ -23,6 +23,11 @@ public class DefaultInvocationProcessor extends AbstractInvocationProcessor {
     }
 
     @Override
+    public Identity assembleIdentity(BeforeEvent event) {
+        return super.assembleIdentity(event);
+    }
+
+    @Override
     protected InvokeType getType() {
         return type;
     }

@@ -76,8 +76,8 @@ public class DatahubRepeaterUtils {
                         log.info("replay record executing start...");
 //                        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 //                        ClassLoader parent = contextClassLoader.getParent();
-                        Class<?> classInstance = ClassloaderBridge.instance().findClassInstance("com.flux.collaboration.storage.base.dao.RecordMap");
-                        ClassLoader classLoader = classInstance.getClassLoader();
+//                        Class<?> classInstance = ClassloaderBridge.instance().findClassInstance("com.flux.collaboration.storage.base.dao.RecordMap");
+//                        ClassLoader classLoader = classInstance.getClassLoader();
 //                        FieldUtils.writeField( FieldUtils.getDeclaredField(ClassLoader.class, "parent",true),contextClassLoader, classLoader, true);
                         RecordWrapper recordWrapper = SerializerWrapper.hessianDeserialize(recordWrapperStr,
                                 RecordWrapper.class);

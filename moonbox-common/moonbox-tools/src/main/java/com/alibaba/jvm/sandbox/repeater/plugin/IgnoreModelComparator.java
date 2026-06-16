@@ -1,8 +1,8 @@
 package com.alibaba.jvm.sandbox.repeater.plugin;
 
-import com.alibaba.jvm.sandbox.repeater.plugin.comparator.Comparator;
-
 import java.util.List;
+
+import com.alibaba.jvm.sandbox.repeater.plugin.comparator.Comparator;
 
 /**
  * IgnoreModelComparator - 忽略模式对比器，若paths和filedNames命中，则忽略结果差异

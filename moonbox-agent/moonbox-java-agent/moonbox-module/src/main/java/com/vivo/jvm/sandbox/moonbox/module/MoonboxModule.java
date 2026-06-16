@@ -351,7 +351,7 @@ public class MoonboxModule implements Module, ModuleLifecycle {
 
         String repeaterServer = System.getProperty("datahub.repeater.server");
         if (StringUtils.isBlank(repeaterServer)) {
-            repeaterServer = StringUtils.defaultString(System.getProperty("zkService.LocalBindingIp") , InetAddressUtils.getLocalIp())+":" + System.getProperty("zkService.port");
+            repeaterServer = StringUtils.defaultString(System.getProperty("datahubService.LocalBindingIp") , InetAddressUtils.getLocalIp())+":" + StringUtils.defaultString( System.getProperty("datahubService.localBindingPort"), ""+ InetAddressUtils.getTomcatPort() );
         }
 //        String decodeStr = URLDecoder.decode(taskRunConfig, "UTF-8");
 //        String[] array = decodeStr.split("&");

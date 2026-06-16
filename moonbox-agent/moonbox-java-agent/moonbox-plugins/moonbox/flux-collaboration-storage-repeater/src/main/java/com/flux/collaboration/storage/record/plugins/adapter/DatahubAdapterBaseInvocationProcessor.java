@@ -7,11 +7,20 @@ import com.alibaba.jvm.sandbox.repeater.plugin.utils.ParameterTypesUtil;
 import com.vivo.internet.moonbox.common.api.model.Identity;
 import com.vivo.internet.moonbox.common.api.model.InvokeType;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DatahubAdapterBaseInvocationProcessor extends DefaultInvocationProcessor {
+
+    private  Logger logger = LoggerFactory.getLogger(DatahubAdapterBaseInvocationProcessor.class);
+    /*
+     *  V101(20260519) yijiakang 【Sonar漏洞修复】修复 SonarQube 扫描问题，任务号:20260509145520000648
+     */
+    @SuppressWarnings("java:S1068")
+    private static final String VERNUM = "V101(20260519)" ;
 
     private ThreadLocal<Map<String, String>> extraLocal = new ThreadLocal<>();
 
@@ -34,7 +43,8 @@ public class DatahubAdapterBaseInvocationProcessor extends DefaultInvocationProc
             getExtra().put("datahubCustomerId", datahubCustomerId);
             getExtra().put("messageId", messageId);
         } catch (Exception e) {
-            e.printStackTrace();
+            // 20260519 yijiakang 【功能完善】 SONARQUBE 漏洞修复 (20260509145520000648)
+            logger.error(e.getMessage(),e);
         }
         Identity identity = new Identity(getType().name(), event.target.getClass().getCanonicalName(), event.javaMethodName + ParameterTypesUtil.getTypesStrByObjects(event.argumentArray), getExtra());
         extraLocal.remove();

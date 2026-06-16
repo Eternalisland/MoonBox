@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <artifactId>moonbox-plugins</artifactId>
+        <groupId>com.vivo.internet</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>flux-collaboration-storage-repeater</artifactId>
+    <name>flux-collaboration-storage-repeater</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <datahub.core.version>8.1.0-SNAPSHOT</datahub.core.version>
+    </properties>
+    <dependencies>
+        <!-- test -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- DATAHUB -->
+<!--        <dependency>-->
+<!--            <groupId>com.flux.wmsv6</groupId>-->
+<!--            <artifactId>flux-collaboration-SrvApi</artifactId>-->
+<!--            <version>${datahub.core.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.flux.wmsv6</groupId>-->
+<!--            <artifactId>flux-collaboration-utils</artifactId>-->
+<!--            <version>${datahub.core.version}</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.joyent.util</groupId>
+            <artifactId>fast-md5</artifactId>
+            <version>2.7.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.jvm.sandbox</groupId>
+            <artifactId>sandbox-api</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.jvm.sandbox</groupId>
+            <artifactId>sandbox-common-api</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke.metainf-services</groupId>
+            <artifactId>metainf-services</artifactId>
+            <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vivo.internet</groupId>
+            <artifactId>moonbox-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vivo.internet</groupId>
+            <artifactId>moonbox-data</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>wmsv5-releases</id>
+            <name>flux wmsv5 Release Repository</name>
+            <url>${flux.nexus.server.url}content/repositories/wmsv5-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>wmsv5-snapshots</id>
+            <name>flux wmsv5 snapshot Repository</name>
+            <url>${flux.nexus.server.url}content/repositories/wmsv5-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+    <build>
+        <finalName>${project.name}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

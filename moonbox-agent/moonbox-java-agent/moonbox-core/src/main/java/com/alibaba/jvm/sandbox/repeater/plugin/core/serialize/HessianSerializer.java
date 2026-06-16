@@ -3,11 +3,11 @@ This code comes from the jvm-sandbox-repeater(link:https://github.com/alibaba/jv
  */
 package com.alibaba.jvm.sandbox.repeater.plugin.core.serialize;
 
+import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.ClassloaderBridge;
 import com.alibaba.com.caucho.hessian.io.Hessian2Input;
 import com.alibaba.com.caucho.hessian.io.Hessian2Output;
 import com.alibaba.com.caucho.hessian.io.SerializerFactory;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.ClassloaderBridge;
-
+import com.alibaba.com.caucho.hessian.io.BigDecimalSerializerFactory;
 import com.google.common.collect.Maps;
 import org.kohsuke.MetaInfServices;
 
@@ -27,11 +27,6 @@ public class HessianSerializer extends AbstractSerializerAdapter {
 
     private Map<String, SerializerFactory> cached = Maps.newConcurrentMap();
 
-    private static boolean isJava8() {
-        String javaVersion = System.getProperty("java.specification.version");
-        return Double.valueOf(javaVersion) >= 1.8D;
-    }
-
     @Override
     public Type type() {
         return Type.HESSIAN;
@@ -46,7 +41,7 @@ public class HessianSerializer extends AbstractSerializerAdapter {
         try {
             output.writeObject(object);
             output.close();
-        } catch (Throwable t) {
+        } catch (Exception t) {
             // may produce sof exception
             throw new SerializeException("[Error-1001]-hessian-serialize-error", t);
         }
@@ -62,7 +57,7 @@ public class HessianSerializer extends AbstractSerializerAdapter {
         try {
             readObject = input.readObject(type);
             input.close();
-        } catch (Throwable t) {
+        } catch (Exception t) {
             throw new SerializeException("[Error-1002]-hessian-deserialize-error", t);
         }
         return (T) readObject;
@@ -76,7 +71,7 @@ public class HessianSerializer extends AbstractSerializerAdapter {
         try {
             readObject = input.readObject();
             input.close();
-        } catch (Throwable t) {
+        } catch (Exception t) {
             throw new SerializeException("[Error-1002]-hessian-deserialize-error", t);
         }
         return readObject;
@@ -116,11 +111,7 @@ public class HessianSerializer extends AbstractSerializerAdapter {
     }
 
     private void registerCustomFactory(SerializerFactory factory) {
-        // try to register jdk8time
-//        if (isJava8()) {
-//            factory.addFactory(new Java8TimeSerializerFactory());
-//        }
-//        // add big decimal factory
-//        factory.addFactory(new BigDecimalSerializerFactory());
+        // add big decimal factory
+        factory.addFactory(new BigDecimalSerializerFactory());
     }
 }

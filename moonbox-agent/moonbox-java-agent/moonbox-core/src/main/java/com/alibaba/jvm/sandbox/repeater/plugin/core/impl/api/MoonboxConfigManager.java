@@ -79,6 +79,10 @@ public final class MoonboxConfigManager {
         Map<String, String> param = new HashMap<>(4);
         param.put("taskRunId", MOONBOX_CONTEXT.getTaskRunId());
         param.put("ip", MOONBOX_CONTEXT.getHost());
+        // 20260614 yijiakang 性能监控自动启动时仅拉取性能插件配置，避免增强录制回放逻辑。
+        if (Boolean.parseBoolean(System.getProperty(Constants.PERFORMANCE_ONLY_PROPERTY))) {
+            param.put(Constants.PERFORMANCE_ONLY_PARAM, Boolean.TRUE.toString());
+        }
         return param;
     }
 

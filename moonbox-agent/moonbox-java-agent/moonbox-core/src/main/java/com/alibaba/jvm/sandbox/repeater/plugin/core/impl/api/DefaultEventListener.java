@@ -253,7 +253,6 @@ public class DefaultEventListener implements EventListener {
         if (null == invocation) {
             ContextResourceClear.sampleFalse();
             MoonboxRecordCache.removeInvocation(event.invokeId);
-
             return;
         }
 

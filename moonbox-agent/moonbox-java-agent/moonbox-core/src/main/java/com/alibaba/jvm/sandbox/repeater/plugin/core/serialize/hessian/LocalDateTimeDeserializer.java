@@ -4,7 +4,6 @@ This code comes from the jvm-sandbox-repeater(link:https://github.com/alibaba/jv
 package com.alibaba.jvm.sandbox.repeater.plugin.core.serialize.hessian;
 
 
-
 import com.alibaba.com.caucho.hessian.io.AbstractDeserializer;
 import com.alibaba.com.caucho.hessian.io.AbstractHessianInput;
 import com.alibaba.com.caucho.hessian.io.IOExceptionWrapper;

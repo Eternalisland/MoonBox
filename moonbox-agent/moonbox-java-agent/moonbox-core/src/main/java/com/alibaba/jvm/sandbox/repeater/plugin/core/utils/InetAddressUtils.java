@@ -1,19 +1,21 @@
 package com.alibaba.jvm.sandbox.repeater.plugin.core.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.nio.file.Files;
 import java.util.Enumeration;
-
+import java.util.LinkedHashSet;
+import java.util.Set;
 /**
  * @author huang-gz
  * @date 2023/04/07
@@ -52,7 +54,7 @@ public class InetAddressUtils {
                     ip = address.nextElement();
                     if ( ip.isSiteLocalAddress() &&
                             !ip.isLoopbackAddress() &&
-                            ip.getHostAddress().indexOf(":") == -1) {
+                            !ip.getHostAddress().contains(":")) {
                         return ip.getHostAddress();
                     }
                 }
@@ -63,5 +65,147 @@ public class InetAddressUtils {
         }
         // default value for disaster
         return "127.0.0.1";
+    }
+
+    public static String getTomcatPort() {
+        Set<String> ports = new LinkedHashSet<>();
+
+        // 1. 优先从 JMX 获取真实运行端口
+        try {
+            MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+
+            Set<ObjectName> connectorNames = mBeanServer.queryNames(
+                    new ObjectName("*:type=Connector,*"),
+                    null
+            );
+
+            for (ObjectName name : connectorNames) {
+                Object protocolObj = getAttributeQuietly(mBeanServer, name, "protocol");
+                Object schemeObj = getAttributeQuietly(mBeanServer, name, "scheme");
+                Object portObj = getAttributeQuietly(mBeanServer, name, "port");
+                Object localPortObj = getAttributeQuietly(mBeanServer, name, "localPort");
+                Object stateNameObj = getAttributeQuietly(mBeanServer, name, "stateName");
+
+                String protocol = protocolObj == null ? "" : protocolObj.toString().toLowerCase();
+                String scheme = schemeObj == null ? "" : schemeObj.toString().toLowerCase();
+                String stateName = stateNameObj == null ? "" : stateNameObj.toString();
+
+                boolean isHttpConnector =
+                        protocol.contains("http")
+                                || "http".equals(scheme)
+                                || "https".equals(scheme);
+
+                if (!isHttpConnector) {
+                    continue;
+                }
+
+                if (stateNameObj != null && !"STARTED".equalsIgnoreCase(stateName)) {
+                    continue;
+                }
+
+                String port = null;
+
+                if (localPortObj != null) {
+                    int localPort = Integer.parseInt(localPortObj.toString());
+                    if (localPort > 0) {
+                        port = String.valueOf(localPort);
+                    }
+                }
+
+                if (port == null && portObj != null) {
+                    int p = Integer.parseInt(portObj.toString());
+                    if (p > 0) {
+                        port = String.valueOf(p);
+                    }
+                }
+
+                if (port != null) {
+                    ports.add(port);
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+
+        if (!ports.isEmpty()) {
+            return String.join(",", ports);
+        }
+
+        // 2. 兜底读取 conf/server.xml
+        ports.addAll(readTomcatPortsFromServerXml());
+
+        return ports.isEmpty() ? "" : String.join(",", ports);
+    }
+
+    private static Object getAttributeQuietly(MBeanServer mBeanServer,
+                                              ObjectName objectName,
+                                              String attributeName) {
+        try {
+            return mBeanServer.getAttribute(objectName, attributeName);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    private static Set<String> readTomcatPortsFromServerXml() {
+        Set<String> ports = new LinkedHashSet<>();
+
+        String catalinaBase = System.getProperty("catalina.base");
+        String catalinaHome = System.getProperty("catalina.home");
+
+        readServerXmlPorts(catalinaBase, ports);
+        readServerXmlPorts(catalinaHome, ports);
+
+        return ports;
+    }
+
+    private static void readServerXmlPorts(String catalinaPath, Set<String> ports) {
+        if (catalinaPath == null || catalinaPath.trim().isEmpty()) {
+            return;
+        }
+
+        File serverXml = new File(catalinaPath, "conf/server.xml");
+
+        if (!serverXml.exists() || !serverXml.isFile()) {
+            return;
+        }
+
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            // 防止 XXE
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setExpandEntityReferences(false);
+
+            Document document = factory.newDocumentBuilder().parse(serverXml);
+            NodeList connectors = document.getElementsByTagName("Connector");
+
+            for (int i = 0; i < connectors.getLength(); i++) {
+                Element connector = (Element) connectors.item(i);
+
+                String port = connector.getAttribute("port");
+                String protocol = connector.getAttribute("protocol");
+                String scheme = connector.getAttribute("scheme");
+
+                protocol = protocol == null ? "" : protocol.toLowerCase();
+                scheme = scheme == null ? "" : scheme.toLowerCase();
+
+                boolean isHttpConnector =
+                        protocol.contains("http")
+                                || "http".equals(scheme)
+                                || "https".equals(scheme)
+                                || protocol.isEmpty();
+
+                if (!isHttpConnector) {
+                    continue;
+                }
+
+                if (port != null && port.matches("\\d+") && Integer.parseInt(port) > 0) {
+                    ports.add(port);
+                }
+            }
+        } catch (Throwable ignored) {
+        }
     }
 }

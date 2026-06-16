@@ -10,6 +10,13 @@ package com.alibaba.jvm.sandbox.repeater.plugin.common;
 public final class Constants {
 
     /**
+     * 20260614 yijiakang 性能监控 Agent 独立配置模式。
+     */
+    public static final String PERFORMANCE_ONLY_PROPERTY = "datahub.repeater.performance.only";
+
+    public static final String PERFORMANCE_ONLY_PARAM = "performanceOnly";
+
+    /**
      * agent <==> module通信传输字段
      */
     public static final String DATA_TRANSPORT_IDENTIFY = "_data";
