@@ -29,13 +29,24 @@ import java.io.Serializable;
  * @version 1.0
  * @since 2022/8/22 17:06
  */
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class RecordPullRequest implements Serializable {
 
     private static final long serialVersionUID = -2647359692813964492L;
+
+    public RecordPullRequest() {
+    }
+
+    public RecordPullRequest(String scrollId, String replayTaskRunId, String recordTaskRunId, String organizationId, String datahubCustomerId, String messageId, String traceId, int pageIndex, int pageSize) {
+        this.scrollId = scrollId;
+        this.replayTaskRunId = replayTaskRunId;
+        this.recordTaskRunId = recordTaskRunId;
+        this.organizationId = organizationId;
+        this.datahubCustomerId = datahubCustomerId;
+        this.messageId = messageId;
+        this.traceId = traceId;
+        this.pageIndex = pageIndex;
+        this.pageSize = pageSize;
+    }
 
     private String scrollId;
 
@@ -67,4 +78,146 @@ public class RecordPullRequest implements Serializable {
      *
      */
     private int pageSize = 100;
+
+    public static RecordPullRequestBuilder builder() {
+        return new RecordPullRequestBuilder();
+    }
+
+
+    public static final class RecordPullRequestBuilder {
+        private RecordPullRequest recordPullRequest;
+
+        public RecordPullRequestBuilder() {
+            recordPullRequest = new RecordPullRequest();
+        }
+
+        public RecordPullRequestBuilder(RecordPullRequest recordPullRequest) {
+            this.recordPullRequest = recordPullRequest;
+        }
+
+        public static RecordPullRequestBuilder builder() {
+            return new RecordPullRequestBuilder();
+        }
+
+        public RecordPullRequestBuilder scrollId(String scrollId) {
+            recordPullRequest.setScrollId(scrollId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder replayTaskRunId(String replayTaskRunId) {
+            recordPullRequest.setReplayTaskRunId(replayTaskRunId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder recordTaskRunId(String recordTaskRunId) {
+            recordPullRequest.setRecordTaskRunId(recordTaskRunId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder organizationId(String organizationId) {
+            recordPullRequest.setOrganizationId(organizationId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder datahubCustomerId(String datahubCustomerId) {
+            recordPullRequest.setDatahubCustomerId(datahubCustomerId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder messageId(String messageId) {
+            recordPullRequest.setMessageId(messageId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder traceId(String traceId) {
+            recordPullRequest.setTraceId(traceId);
+            return this;
+        }
+
+        public RecordPullRequestBuilder pageIndex(int pageIndex) {
+            recordPullRequest.setPageIndex(pageIndex);
+            return this;
+        }
+
+        public RecordPullRequestBuilder pageSize(int pageSize) {
+            recordPullRequest.setPageSize(pageSize);
+            return this;
+        }
+
+        public RecordPullRequest build() {
+            return recordPullRequest;
+        }
+    }
+
+    public String getScrollId() {
+        return scrollId;
+    }
+
+    public void setScrollId(String scrollId) {
+        this.scrollId = scrollId;
+    }
+
+    public String getReplayTaskRunId() {
+        return replayTaskRunId;
+    }
+
+    public void setReplayTaskRunId(String replayTaskRunId) {
+        this.replayTaskRunId = replayTaskRunId;
+    }
+
+    public String getRecordTaskRunId() {
+        return recordTaskRunId;
+    }
+
+    public void setRecordTaskRunId(String recordTaskRunId) {
+        this.recordTaskRunId = recordTaskRunId;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getDatahubCustomerId() {
+        return datahubCustomerId;
+    }
+
+    public void setDatahubCustomerId(String datahubCustomerId) {
+        this.datahubCustomerId = datahubCustomerId;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
 }

@@ -100,6 +100,8 @@ public enum InvokeType {
     // 文件相关操作
     DATAHUB_DB_FS_OP("datahub-db-fs-op"),
 
+    DATAHUB_PERFORMANCE_MONITOR("datahub-performance-monitor"),
+
     UNKNOWN("unknown");
 
     private String invokeName;
@@ -133,7 +135,7 @@ public enum InvokeType {
 
     /**
      * 对于下面这几种类型插件，不需要记录匹配过程，如果失败了，直接去执行源代码逻辑就行。
-     *
+     * 
      * @param invokeType
      * @return
      */

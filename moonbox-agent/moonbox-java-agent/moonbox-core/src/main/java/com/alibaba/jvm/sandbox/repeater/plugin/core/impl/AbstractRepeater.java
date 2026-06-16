@@ -46,6 +46,10 @@ public abstract class AbstractRepeater implements Repeater {
         RepeatModel record = new RepeatModel();
         record.setRepeatId(context.getMeta().getRepeatId());
         record.setTraceId(context.getTraceId());
+        record.setDatahubCustomerId(context.getRecordModel().getDatahubCustomerId());
+        record.setMessageId(context.getRecordModel().getMessageId());
+        record.setOrganizationId(context.getRecordModel().getOrganizationId());
+        // 使用录制流量的traceId，流量服务用这个id关联相应的流量源数据
         // 使用录制流量的traceId，流量服务用这个id关联相应的流量源数据
         record.setRecordTraceId(context.getRecordModel().getTraceId());
         record.setTaskRunId(INSTANCE.getTaskRunId());
