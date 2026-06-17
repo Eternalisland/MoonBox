@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.ClassloaderBridge;
+import com.vivo.internet.moonbox.common.api.model.Invocation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -50,12 +52,25 @@ public abstract class AbstractRepeater implements Repeater {
         record.setMessageId(context.getRecordModel().getMessageId());
         record.setOrganizationId(context.getRecordModel().getOrganizationId());
         // 使用录制流量的traceId，流量服务用这个id关联相应的流量源数据
-        // 使用录制流量的traceId，流量服务用这个id关联相应的流量源数据
         record.setRecordTraceId(context.getRecordModel().getTraceId());
         record.setTaskRunId(INSTANCE.getTaskRunId());
         record.setRecordTaskRunId(context.getRecordModel().getTaskRunId());
         record.setHost(INSTANCE.getHost());
         record.setStatus(ReplayStatus.REPLAY_SUCCESS.getCode());
+
+        // 获取录制时的应用ClassLoader，解决moonbox线程池TCCL为ModuleJarClassLoader导致回放时找不到应用类的问题
+        ClassLoader appClassLoader = null;
+        Invocation entranceInvocation = context.getRecordModel().getEntranceInvocation();
+        if (entranceInvocation != null) {
+            String serializeToken = entranceInvocation.getSerializeToken();
+            if (StringUtils.isNotBlank(serializeToken)) {
+                appClassLoader = ClassloaderBridge.instance().decode(serializeToken);
+            }
+        }
+        ClassLoader originalTcc = Thread.currentThread().getContextClassLoader();
+        if (appClassLoader != null) {
+            Thread.currentThread().setContextClassLoader(appClassLoader);
+        }
 
         try {
             // before invoke advice
@@ -110,6 +125,10 @@ public abstract class AbstractRepeater implements Repeater {
             }
 
         } finally {
+            // 恢复原始TCCL
+            if (appClassLoader != null) {
+                Thread.currentThread().setContextClassLoader(originalTcc);
+            }
             SysTimeUtils.updateSysTime(0L);
             // Tracer.end();
         }

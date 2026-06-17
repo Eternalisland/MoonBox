@@ -4,7 +4,6 @@ import com.alibaba.jvm.sandbox.repeater.plugin.core.bridge.ClassloaderBridge;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.impl.AbstractRepeater;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.spring.SpringContextAdapter;
 import com.alibaba.jvm.sandbox.repeater.plugin.core.trace.Tracer;
-import com.alibaba.jvm.sandbox.repeater.plugin.core.utils.MethodSignatureParser;
 import com.alibaba.jvm.sandbox.repeater.plugin.domain.RepeatContext;
 import com.alibaba.jvm.sandbox.repeater.plugin.exception.RepeatException;
 import com.alibaba.jvm.sandbox.repeater.plugin.spi.Repeater;
@@ -13,7 +12,6 @@ import com.vivo.internet.moonbox.common.api.model.Identity;
 import com.vivo.internet.moonbox.common.api.model.Invocation;
 import com.vivo.internet.moonbox.common.api.model.InvokeType;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.kohsuke.MetaInfServices;
 
@@ -24,7 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -86,7 +83,7 @@ public class NettyHttpBaseRepeater extends AbstractRepeater {
                 })
                 .flatMap(secondMap -> secondMap != null ? secondMap.values().stream() : Stream.empty()) // 展开第二层 Map 的 Value 流（第三层 Map）
                 .flatMap(thirdMap -> thirdMap != null ? thirdMap.values().stream() : Stream.empty()) // 展开第三层 Map 的 Value 流（Object）
-                .collect(Collectors.toList());
+                .toList();
 
         Map<String,Object> serverHandler = new HashMap<>();
         for (Object serviceObject : allObjects) {
@@ -101,7 +98,7 @@ public class NettyHttpBaseRepeater extends AbstractRepeater {
             Map<String,Map<String, Object>> servicesHandler = (Map<String, Map<String, Object>>) servicesHandlerField.get(serviceObject);
             List<Object> serverLists = servicesHandler.values().stream()
                     .flatMap(secondMap -> secondMap != null ? secondMap.values().stream() : Stream.empty())
-                    .collect(Collectors.toList());
+                    .toList();
             for (Object serverHandle : serverLists) {
 
                 Field nettyChannelInitializerField = serverHandle.getClass().getDeclaredField("nettyChannelInitializer");
@@ -163,27 +160,39 @@ public class NettyHttpBaseRepeater extends AbstractRepeater {
         // 这里没法办像HTTP、DUBBO透传traceId，因此在执行前先执行Trace.start()，根据traceId创建好TraceContext，避免在
         Tracer.start(context.getTraceId());
 
-        Object[] httpRequest = invocation.getRequest();
-
-        Map<String,Object> httpParamMap = (Map<String, Object>) httpRequest[0];
-
-        Object headers = httpParamMap.get("headers");
-        Object paramsMap = httpParamMap.get("paramsMap");
-        Object body = httpParamMap.get("body");
-        // 开始invoke
-        Object result = method.invoke(bean, headers, paramsMap, body);
+        // 设置TCCL为应用ClassLoader，确保method.invoke内部代码能正确加载应用类
+        ClassLoader originalTccLocal = Thread.currentThread().getContextClassLoader();
         try {
-            String responseBody = (String) MethodUtils.invokeMethod(result, "getResponseBody");
-            Object httpStatus = (Object) MethodUtils.invokeMethod(result, "getHttpStatus");
-            int statusCode = (int) MethodUtils.invokeMethod(httpStatus, "code");
-            if(statusCode >= 400) {
-                responseBody = "http response status is: " + statusCode + ", " + responseBody ;
+            if (classLoader != null) {
+                Thread.currentThread().setContextClassLoader(classLoader);
             }
-            return responseBody ;
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
+
+            Object[] httpRequest = invocation.getRequest();
+
+            Map<String,Object> httpParamMap = (Map<String, Object>) httpRequest[0];
+
+            Object headers = httpParamMap.get("headers");
+            Object paramsMap = httpParamMap.get("paramsMap");
+            Object body = httpParamMap.get("body");
+            // 开始invoke
+            Object result = method.invoke(bean, headers, paramsMap, body);
+            try {
+                String responseBody = (String) MethodUtils.invokeMethod(result, "getResponseBody");
+                Object httpStatus = (Object) MethodUtils.invokeMethod(result, "getHttpStatus");
+                int statusCode = (int) MethodUtils.invokeMethod(httpStatus, "code");
+                if(statusCode >= 400) {
+                    responseBody = "http response status is: " + statusCode + ", " + responseBody ;
+                }
+                return responseBody ;
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
+            return result;
+        } finally {
+            if (classLoader != null) {
+                Thread.currentThread().setContextClassLoader(originalTccLocal);
+            }
         }
-        return result;
     }
 
     private Method findTargetMethod (Object bean, String methodName, Class<?>... parameterType) {

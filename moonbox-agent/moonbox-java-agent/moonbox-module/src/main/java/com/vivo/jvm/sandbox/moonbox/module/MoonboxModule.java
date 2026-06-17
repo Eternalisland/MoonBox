@@ -388,9 +388,7 @@ public class MoonboxModule implements Module, ModuleLifecycle {
                 return;
             }
             Map<String, String> requestParams = new HashMap<String, String>(16);
-            for (Map.Entry<String, String> entry : req.entrySet()) {
-                requestParams.put(entry.getKey(), entry.getValue());
-            }
+            requestParams.putAll(req);
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             RecordPullRequest recordPullRequest = objectMapper.convertValue(requestParams, RecordPullRequest.class);

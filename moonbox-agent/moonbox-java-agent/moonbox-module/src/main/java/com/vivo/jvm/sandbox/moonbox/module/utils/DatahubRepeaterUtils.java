@@ -76,11 +76,11 @@ public class DatahubRepeaterUtils {
                         log.info("replay record executing start...");
 //                        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 //                        ClassLoader parent = contextClassLoader.getParent();
-//                        Class<?> classInstance = ClassloaderBridge.instance().findClassInstance("com.flux.collaboration.storage.base.dao.RecordMap");
+                        Class<?> classInstance = ClassloaderBridge.instance().findClassInstance("com.flux.collaboration.storage.base.dao.RecordMap");
 //                        ClassLoader classLoader = classInstance.getClassLoader();
 //                        FieldUtils.writeField( FieldUtils.getDeclaredField(ClassLoader.class, "parent",true),contextClassLoader, classLoader, true);
                         RecordWrapper recordWrapper = SerializerWrapper.hessianDeserialize(recordWrapperStr,
-                                RecordWrapper.class);
+                                RecordWrapper.class, classInstance == null ? null : classInstance.getClassLoader());
 //                        FieldUtils.writeField(FieldUtils.getDeclaredField(ClassLoader.class, "parent",true) ,contextClassLoader, parent, true);
                         // 转换recordWrapper（流量数据）并且获取repeaterMeta（回放配置元数据）
                         RepeatMeta meta = convertWrapperAndMeta(recordWrapper);
