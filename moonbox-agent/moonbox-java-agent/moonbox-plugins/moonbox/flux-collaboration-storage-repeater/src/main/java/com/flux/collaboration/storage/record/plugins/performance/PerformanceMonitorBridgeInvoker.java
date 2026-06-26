@@ -16,6 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PerformanceMonitorBridgeInvoker {
 
+    /**
+     * V100(20260626) yijiakang 【功能完善】流程定时器绑定性能链路最终监控流水号，增加本地缓存与 Rust JNI 性能统计字段 本地缓存之后 redis和mongodb操作耗时变得无意义，需要对齐本地缓存性能统计，任务号:20260522102904000460
+     */
+    @SuppressWarnings("unused")
+    private static final String verNum = "V100(20260626)";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceMonitorBridgeInvoker.class);
     private static final String BRIDGE_BEAN_NAME = "datahubPerformanceMonitorBridge";
     private static final Map<String, Method> METHOD_CACHE = new ConcurrentHashMap<>();
@@ -37,6 +43,10 @@ public final class PerformanceMonitorBridgeInvoker {
 
     public static void startTrace(String traceId) {
         invokeQuietly("startTrace", new Class<?>[]{String.class}, traceId);
+    }
+
+    public static void bindMessageGroupSysId(String traceId, String messageGroupSysId) {
+        invokeQuietly("bindMessageGroupSysId", new Class<?>[]{String.class, String.class}, traceId, messageGroupSysId);
     }
 
     public static String beginSpan(String className, String methodName, String signature, String metricType,
